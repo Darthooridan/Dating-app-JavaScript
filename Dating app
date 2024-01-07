@@ -1,0 +1,79 @@
+'use strict';
+
+const mockData = require('./mockData.js').data;
+const prompt = require('prompt-sync')();
+
+// Your code here
+
+// Function to validate inputs
+function validateInput(question, validationFunc) {
+  let userInput = prompt(question);
+  while (!validationFunc(userInput)) {
+    userInput = prompt(`Invalid input. ${question}`);
+  }
+  return userInput;
+}
+
+// Validate functions for different input types
+function isValidName(input) {
+  return input.trim().length > 0 && /^[A-Za-z]+$/.test(input);
+}
+
+function isValidAge(input) {
+  const age = Number(input);
+  return !isNaN(age) && age >= 18;
+}
+
+function isValidGender(input) {
+  return ['M', 'F', 'X'].includes(input.toUpperCase());
+}
+
+function isValidInterestAge(input) {
+  const age = Number(input);
+  return !isNaN(age) && age >= 18;
+}
+
+function isValidLocation(input) {
+  return ['rural', 'city'].includes(input.toLowerCase());
+}
+
+// Function to create user profile
+function createProfile() {
+  const profile = {};
+  profile.first_name = validateInput('What is your first name? ', isValidName);
+  profile.last_name = validateInput('What is your last name? ', isValidName);
+  profile.age = Number(validateInput('What is your age? ', isValidAge));
+  profile.min_interest_age = Number(validateInput('Minimum age you are interested in? ', isValidInterestAge));
+  profile.max_interest_age = Number(validateInput('Maximum age you are interested in? ', isValidInterestAge));
+  profile.gender = validateInput('What is your gender? (M/F/X) ', isValidGender);
+  profile.gender_interest = validateInput('Which gender are you interested in dating? (M/F/X) ', isValidGender);
+  profile.location = validateInput('What is your location? (rural/city) ', isValidLocation);
+
+  return profile;
+}
+
+// Function to check if a candidate matches user's preferences
+function doesMatch(profile, candidate) {
+  return (
+    candidate.age >= profile.min_interest_age &&
+    candidate.age <= profile.max_interest_age &&
+    candidate.gender === profile.gender_interest &&
+    candidate.gender_interest === profile.gender &&
+    candidate.location === profile.location
+  );
+}
+
+// Get user's profile
+const user = createProfile();
+
+// Match user with potential candidates
+let matches = 0;
+console.log('\nPossible Matches:');
+mockData.forEach(candidate => {
+  if (doesMatch(user, candidate)) {
+    matches++;
+    console.log(`${candidate.first_name} ${candidate.last_name} - Age: ${candidate.age}, Location: ${candidate.location}`);
+  }
+});
+
+console.log(`\nTotal Matches: ${matches}`);
