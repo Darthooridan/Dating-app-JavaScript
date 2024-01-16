@@ -5,6 +5,7 @@ const prompt = require('prompt-sync')();
 
 // Your code here
 
+
 // Function to validate inputs
 function validateInput(question, validationFunc) {
   let userInput = prompt(question);
@@ -44,9 +45,17 @@ function createProfile() {
   profile.last_name = validateInput('What is your last name? ', isValidName);
   profile.age = Number(validateInput('What is your age? ', isValidAge));
   profile.min_interest_age = Number(validateInput('Minimum age you are interested in? ', isValidInterestAge));
-  profile.max_interest_age = Number(validateInput('Maximum age you are interested in? ', isValidInterestAge));
-  profile.gender = validateInput('What is your gender? (M/F/X) ', isValidGender);
-  profile.gender_interest = validateInput('Which gender are you interested in dating? (M/F/X) ', isValidGender);
+
+  // Ensure that max interest age is higher than or equal to min interest age
+  profile.max_interest_age = Number(
+    validateInput(`Maximum age you are interested in? (Must be ${profile.min_interest_age} or higher) `, input => {
+      const maxAge = Number(input);
+      return !isNaN(maxAge) && maxAge >= profile.min_interest_age;
+    })
+  );
+
+  profile.gender = validateInput('What is your gender? (M/F/X) ', isValidGender).toUpperCase();
+  profile.gender_interest = validateInput('Which gender are you interested in dating? (M/F/X) ', isValidGender).toUpperCase();
   profile.location = validateInput('What is your location? (rural/city) ', isValidLocation);
 
   return profile;
@@ -77,3 +86,5 @@ mockData.forEach(candidate => {
 });
 
 console.log(`\nTotal Matches: ${matches}`);
+
+
